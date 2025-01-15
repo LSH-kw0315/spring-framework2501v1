@@ -17,10 +17,12 @@ import java.util.*;
 public class ApplicationContext {
 
     Map<String, Object> beanFactory = new HashMap<>();
+    private static final String FILESEPARATOR=File.separator;
+    private static final String PROJECTROOT=System.getProperty("user.dir")+FILESEPARATOR+"src"+FILESEPARATOR+"main"+FILESEPARATOR+"java";
 
     public void SourceLoad() {
-        String sourceDir = "C:\\Users\\LSH\\Desktop\\멋사\\spring-framework2501v1\\src\\main\\java"; // .java 파일이 있는 디렉토리 경로
-        
+        String sourceDir = PROJECTROOT;// 프로젝트 루트 경로
+
         try {
             // .java 파일로 된 파일 목록 가져오기
             List<File> javaFiles = findJavaFiles(new File(sourceDir));
