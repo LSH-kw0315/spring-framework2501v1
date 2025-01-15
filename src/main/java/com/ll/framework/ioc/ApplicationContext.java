@@ -20,18 +20,16 @@ public class ApplicationContext {
 
     public void SourceLoad() {
         String sourceDir = "C:\\Users\\LSH\\Desktop\\멋사\\spring-framework2501v1\\src\\main\\java"; // .java 파일이 있는 디렉토리 경로
-        String outputDir = "C:\\Users\\LSH\\Desktop\\멋사\\spring-framework2501v1\\src\\main\\java\\com\\ll\\framework\\ioc"; // .class 파일을 저장할 디렉토리 경로
-
+        
         try {
             // .java 파일로 된 파일 목록 가져오기
             List<File> javaFiles = findJavaFiles(new File(sourceDir));
             List<Class<?>> classList = new ArrayList<>();
 
 
-            // .class 파일 로드하여 Class 정보를 획득
+            // forName을 통해 Class 정보를 획득
             for (File javaFile : javaFiles) {
-                Class<?> _class = loadCompiledClass(javaFile, sourceDir, outputDir);
-                classList.add(_class);
+                classList.add(getClass(javaFile, sourceDir));
             }
 
             for (Class<?> _class : classList) {
@@ -40,6 +38,7 @@ public class ApplicationContext {
 
                 //등록되어 있으면 스킵함.
                 if(beanFactory.containsKey(extractBeanName(_class.getName()))) continue;
+
                 //빈 팩토리 등록과 리턴을 동시에 하는 것은 아쉬운 점.
                 generateObjectFromConstructor(_class,constructors);
 
@@ -106,29 +105,11 @@ public class ApplicationContext {
         return javaFiles;
     }
 
-// .java 파일을 class로 컴파일한다. 스캔한 클래스 파일로 로드하기 위해서..
-//    private  void compileJavaFile(File javaFile, String outputDir) throws IOException {
-//        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-//        StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
-//
-//        Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects(javaFile);
-//        List<String> options = List.of("-d", outputDir); // 출력 디렉토리 설정
-//
-//        boolean success = compiler.getTask(null, fileManager, null, options, null, compilationUnits).call();
-//        fileManager.close();
-//
-//    }
-
-    // 컴파일된 클래스 로드
-    private Class<?> loadCompiledClass(File javaFile, String sourceDir, String outputDir) throws Exception {
+    //.java 파일을 이용해 import하는 형태의 클래스 이름을 얻을 수 있으므로 forName으로 클래스 정보를 얻음
+    private Class<?> getClass(File javaFile, String sourceDir) throws Exception {
         String className = extractClassName(javaFile, sourceDir);
-        //File compiledDir = new File(outputDir);
         return Class.forName(className);
-//        try (URLClassLoader classLoader = new URLClassLoader(new URL[]{compiledDir.toURI().toURL()})) {
-//            clazz = classLoader.loadClass(className);
-//            return clazz;
-//        }
-
+        
     }
 
     // .java 파일에서 클래스 이름 추출. 실제로 코드에서 쓸 때 import하는 형태로 추출되므로 패키지명+클래스 형태
